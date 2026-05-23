@@ -4,19 +4,13 @@ export async function fetchYouTubeVideos(maxResults = 8): Promise<Article[]> {
   const apiKey = process.env.YOUTUBE_API_KEY
   if (!apiKey) return []
 
-  const query = encodeURIComponent('CANVAS syndrome RFC1 cerebellar ataxia neuropathy vestibular UK')
+  const query = encodeURIComponent('CANVAS syndrome RFC1 ataxia')
   const res = await fetch(
     `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&order=date&maxResults=${maxResults}&key=${apiKey}`,
     { cache: 'no-store' }
   )
-  if (!res.ok) {
-    console.error('[YouTube] fetch failed:', res.status, await res.text().catch(() => ''))
-    return []
-  }
-  const raw = await res.text()
-  console.log('[YouTube] raw response (first 500):', raw.slice(0, 500))
-  const data = JSON.parse(raw)
-  console.log('[YouTube] keys:', Object.keys(data).join(','), 'items:', data.items?.length ?? 'undefined')
+  if (!res.ok) return []
+  const data = await res.json()
   const items = data.items ?? []
 
   return items
