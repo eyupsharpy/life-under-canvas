@@ -9,7 +9,7 @@ import { fetchTrials } from '@/lib/clinicaltrials'
 import { fetchIsrctnTrials } from '@/lib/isrctn'
 import { fetchPreprints } from '@/lib/europepmc'
 import { fetchNews } from '@/lib/news'
-import { fetchRedditPosts } from '@/lib/reddit'
+import { fetchAtaxiaUKNews } from '@/lib/ataxiauk'
 import { fetchYouTubeVideos } from '@/lib/youtube'
 import { sendNewArticlesEmail } from '@/lib/email'
 
@@ -22,17 +22,17 @@ export async function GET(request: Request) {
   const seenIds: string[] = (await kv.get('seen_article_ids')) ?? []
   const seenSet = new Set(seenIds)
 
-  const [research, preprints, trials, isrctn, news, reddit, youtube] = await Promise.all([
+  const [research, preprints, trials, isrctn, news, ataxiauk, youtube] = await Promise.all([
     fetchLatestArticles(20),
     fetchPreprints(10),
     fetchTrials(10),
     fetchIsrctnTrials(10),
     fetchNews(10),
-    fetchRedditPosts(10),
+    fetchAtaxiaUKNews(10),
     fetchYouTubeVideos(10),
   ])
 
-  const allArticles = [...research, ...preprints, ...trials, ...isrctn, ...news, ...reddit, ...youtube]
+  const allArticles = [...research, ...preprints, ...trials, ...isrctn, ...news, ...ataxiauk, ...youtube]
   const newArticles = allArticles.filter((a) => !seenSet.has(a.id))
 
   if (newArticles.length > 0) {

@@ -4,7 +4,7 @@ import { fetchTrials } from '@/lib/clinicaltrials'
 import { fetchIsrctnTrials } from '@/lib/isrctn'
 import { fetchPreprints } from '@/lib/europepmc'
 import { fetchNews } from '@/lib/news'
-import { fetchRedditPosts } from '@/lib/reddit'
+import { fetchAtaxiaUKNews } from '@/lib/ataxiauk'
 import { fetchYouTubeVideos } from '@/lib/youtube'
 import type { Article } from '@/lib/types'
 import AskSection from '@/components/AskSection'
@@ -156,14 +156,60 @@ async function NewsSection() {
   )
 }
 
-async function RedditSection() {
-  const posts = await fetchRedditPosts(8)
-  if (posts.length === 0) return null
+async function AtaxiaUKSection() {
+  const articles = await fetchAtaxiaUKNews(8)
+  if (articles.length === 0) return null
   return (
     <>
-      <SectionHeader title="Community discussion" source="Reddit" />
+      <SectionHeader title="From Ataxia UK" source="ataxia.org.uk" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {posts.map((a) => <ResearchCard key={a.id} article={a} />)}
+        {articles.map((a) => <ResearchCard key={a.id} article={a} />)}
+      </div>
+    </>
+  )
+}
+
+function CommunityLinks() {
+  const communities = [
+    {
+      name: 'Ataxia UK community',
+      description: 'The HealthUnlocked community run by Ataxia UK — questions, lived experience, and peer support from people affected by ataxia.',
+      url: 'https://healthunlocked.com/ataxia-uk',
+      label: 'Join the conversation →',
+    },
+    {
+      name: 'Ataxia UK',
+      description: 'The UK\'s leading ataxia charity. Information on CANVAS, specialist clinics, research funding, and support services.',
+      url: 'https://www.ataxia.org.uk',
+      label: 'Visit Ataxia UK →',
+    },
+    {
+      name: 'RFC1 CANVAS Research Group',
+      description: 'Research updates from the international clinical and scientific community studying RFC1-related CANVAS syndrome.',
+      url: 'https://pubmed.ncbi.nlm.nih.gov/?term=RFC1+CANVAS',
+      label: 'View research →',
+    },
+  ]
+
+  return (
+    <>
+      <SectionHeader title="Patient community" source="HealthUnlocked · Ataxia UK" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {communities.map((c) => (
+          <a
+            key={c.name}
+            href={c.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group border border-[#d2d2d7] rounded-2xl p-6 hover:border-[#0071e3] transition-colors flex flex-col"
+          >
+            <h3 className="text-[17px] font-semibold text-[#1d1d1f] leading-snug mb-2 group-hover:text-[#0071e3] transition-colors">
+              {c.name}
+            </h3>
+            <p className="text-[14px] text-[#6e6e73] leading-relaxed flex-1">{c.description}</p>
+            <span className="mt-4 inline-block text-[14px] text-[#0071e3]">{c.label}</span>
+          </a>
+        ))}
       </div>
     </>
   )
@@ -227,7 +273,7 @@ export default function Home() {
 
         <section>
           <Suspense fallback={<SkeletonGrid count={4} />}>
-            <RedditSection />
+            <AtaxiaUKSection />
           </Suspense>
         </section>
 
@@ -235,6 +281,10 @@ export default function Home() {
           <Suspense fallback={<SkeletonGrid count={4} />}>
             <YouTubeSection />
           </Suspense>
+        </section>
+
+        <section>
+          <CommunityLinks />
         </section>
 
         <AskSection />
