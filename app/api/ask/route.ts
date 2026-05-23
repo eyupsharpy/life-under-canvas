@@ -3,10 +3,10 @@ import Anthropic from '@anthropic-ai/sdk'
 const client = new Anthropic()
 
 export async function POST(request: Request) {
-  const { question } = await request.json()
+  const { messages } = await request.json()
 
-  if (!question || typeof question !== 'string') {
-    return Response.json({ error: 'Question is required' }, { status: 400 })
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    return Response.json({ error: 'Messages are required' }, { status: 400 })
   }
 
   const message = await client.messages.create({
@@ -16,8 +16,10 @@ export async function POST(request: Request) {
 
 Answer questions clearly, accurately, and with empathy. Use plain language — avoid unnecessary jargon. When relevant, mention that they should consult their neurologist or specialist for personal medical decisions.
 
-CANVAS syndrome is a rare recessive ataxia caused by biallelic RFC1 repeat expansions, characterised by cerebellar ataxia, sensory neuropathy, vestibular areflexia, and often a chronic cough.`,
-    messages: [{ role: 'user', content: question }],
+CANVAS syndrome is a rare recessive ataxia caused by biallelic RFC1 repeat expansions, characterised by cerebellar ataxia, sensory neuropathy, vestibular areflexia, and often a chronic cough.
+
+Format your responses clearly: use short paragraphs. Do not use markdown headers or bullet points — write in flowing prose.`,
+    messages,
   })
 
   const text = message.content[0].type === 'text' ? message.content[0].text : ''
