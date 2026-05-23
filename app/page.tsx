@@ -5,6 +5,7 @@ import { fetchIsrctnTrials } from '@/lib/isrctn'
 import { fetchPreprints } from '@/lib/europepmc'
 import { fetchNews } from '@/lib/news'
 import { fetchAtaxiaUKNews } from '@/lib/ataxiauk'
+import { fetchEuroAtaxiaNews } from '@/lib/euroataxia'
 import { fetchYouTubeVideos } from '@/lib/youtube'
 import type { Article } from '@/lib/types'
 import AskSection from '@/components/AskSection'
@@ -169,6 +170,19 @@ async function AtaxiaUKSection() {
   )
 }
 
+async function EuroAtaxiaSection() {
+  const articles = await fetchEuroAtaxiaNews(6)
+  if (articles.length === 0) return null
+  return (
+    <>
+      <SectionHeader title="From Euro Ataxia" source="euroataxia.org" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {articles.map((a) => <ResearchCard key={a.id} article={a} />)}
+      </div>
+    </>
+  )
+}
+
 function CommunityLinks() {
   const communities = [
     {
@@ -274,6 +288,12 @@ export default function Home() {
         <section>
           <Suspense fallback={<SkeletonGrid count={4} />}>
             <AtaxiaUKSection />
+          </Suspense>
+        </section>
+
+        <section>
+          <Suspense fallback={<SkeletonGrid count={4} />}>
+            <EuroAtaxiaSection />
           </Suspense>
         </section>
 
