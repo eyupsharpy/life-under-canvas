@@ -9,8 +9,12 @@ export async function fetchYouTubeVideos(maxResults = 8): Promise<Article[]> {
     `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&order=date&maxResults=${maxResults}&key=${apiKey}`,
     { cache: 'no-store' }
   )
-  if (!res.ok) return []
+  if (!res.ok) {
+    console.error('[YouTube] fetch failed:', res.status, await res.text().catch(() => ''))
+    return []
+  }
   const data = await res.json()
+  console.log('[YouTube] items returned:', data.items?.length ?? 0, 'error:', data.error ?? null)
   const items = data.items ?? []
 
   return items
