@@ -1,5 +1,5 @@
 import { Resend } from 'resend'
-import type { Article } from './pubmed'
+import type { Article } from './types'
 
 export async function sendNewArticlesEmail(articles: Article[]) {
   const resend = new Resend(process.env.RESEND_API_KEY)

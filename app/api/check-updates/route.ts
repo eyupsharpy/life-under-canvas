@@ -1,5 +1,16 @@
-import { kv } from '@vercel/kv'
-import { fetchNewArticleIds } from '@/lib/pubmed'
+import { Redis } from '@upstash/redis'
+
+const kv = new Redis({
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
+})
+import { fetchLatestArticles } from '@/lib/pubmed'
+import { fetchTrials } from '@/lib/clinicaltrials'
+import { fetchIsrctnTrials } from '@/lib/isrctn'
+import { fetchPreprints } from '@/lib/europepmc'
+import { fetchNews } from '@/lib/news'
+import { fetchRedditPosts } from '@/lib/reddit'
+import { fetchYouTubeVideos } from '@/lib/youtube'
 import { sendNewArticlesEmail } from '@/lib/email'
 
 export async function GET(request: Request) {
@@ -8,13 +19,26 @@ export async function GET(request: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const seenIds: string[] = (await kv.get('seen_pubmed_ids')) ?? []
-  const newArticles = await fetchNewArticleIds(seenIds)
+  const seenIds: string[] = (await kv.get('seen_article_ids')) ?? []
+  const seenSet = new Set(seenIds)
+
+  const [research, preprints, trials, isrctn, news, reddit, youtube] = await Promise.all([
+    fetchLatestArticles(20),
+    fetchPreprints(10),
+    fetchTrials(10),
+    fetchIsrctnTrials(10),
+    fetchNews(10),
+    fetchRedditPosts(10),
+    fetchYouTubeVideos(10),
+  ])
+
+  const allArticles = [...research, ...preprints, ...trials, ...isrctn, ...news, ...reddit, ...youtube]
+  const newArticles = allArticles.filter((a) => !seenSet.has(a.id))
 
   if (newArticles.length > 0) {
     await sendNewArticlesEmail(newArticles)
-    const updatedIds = [...new Set([...seenIds, ...newArticles.map((a) => a.id)])]
-    await kv.set('seen_pubmed_ids', updatedIds)
+    const updatedIds = [...new Set([...seenIds, ...allArticles.map((a) => a.id)])]
+    await kv.set('seen_article_ids', updatedIds)
   }
 
   return Response.json({
