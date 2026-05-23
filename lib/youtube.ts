@@ -13,8 +13,10 @@ export async function fetchYouTubeVideos(maxResults = 8): Promise<Article[]> {
     console.error('[YouTube] fetch failed:', res.status, await res.text().catch(() => ''))
     return []
   }
-  const data = await res.json()
-  console.log('[YouTube] items returned:', data.items?.length ?? 0, 'error:', data.error ?? null)
+  const raw = await res.text()
+  console.log('[YouTube] raw response (first 500):', raw.slice(0, 500))
+  const data = JSON.parse(raw)
+  console.log('[YouTube] keys:', Object.keys(data).join(','), 'items:', data.items?.length ?? 'undefined')
   const items = data.items ?? []
 
   return items
