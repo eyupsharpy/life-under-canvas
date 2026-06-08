@@ -249,9 +249,14 @@ export default function Home() {
       <nav className="sticky top-0 z-10 border-b border-[#d2d2d7] bg-white/80 backdrop-blur-md">
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <span className="text-[17px] font-semibold text-[#1d1d1f]">Life under CANVAS</span>
-          <Link href="/links" className="text-[14px] text-[#0071e3] font-medium hover:underline">
-            Useful links
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link href="/archive" className="text-[14px] text-[#0071e3] font-medium hover:underline">
+              Archive
+            </Link>
+            <Link href="/links" className="text-[14px] text-[#0071e3] font-medium hover:underline">
+              Useful links
+            </Link>
+          </div>
         </div>
       </nav>
 

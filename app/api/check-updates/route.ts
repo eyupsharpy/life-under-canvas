@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis'
+import { put } from '@vercel/blob'
 
 const kv = new Redis({
   url: process.env.KV_REST_API_URL!,
@@ -38,9 +39,17 @@ export async function GET(request: Request) {
   const newArticles = allArticles.filter((a) => !seenSet.has(a.id))
 
   if (newArticles.length > 0) {
-    await sendNewArticlesEmail(newArticles)
+    const date = new Date().toISOString().slice(0, 10)
+    await Promise.all([
+      sendNewArticlesEmail(newArticles),
+      put(`archive/${date}.json`, JSON.stringify(newArticles), {
+        access: 'public',
+        contentType: 'application/json',
+        addRandomSuffix: false,
+      }),
+    ])
     const updatedIds = [...new Set([...seenIds, ...allArticles.map((a) => a.id)])]
-    await kv.set('seen_article_ids', updatedIds)
+    await kv.set('seen_article_ids', updatedIds.slice(-500))
   }
 
   return Response.json({

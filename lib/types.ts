@@ -5,7 +5,7 @@ export interface Article {
   journal: string
   pubDate: string
   url: string
-  source: 'PubMed' | 'Europe PMC' | 'ClinicalTrials.gov' | 'News'
+  source: 'PubMed' | 'Europe PMC' | 'ClinicalTrials.gov' | 'ISRCTN' | 'News' | 'AtaxiaUK' | 'EuroAtaxia' | 'YouTube'
   status?: string
   summary?: string
 }
