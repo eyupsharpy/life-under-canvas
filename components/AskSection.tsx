@@ -7,13 +7,29 @@ interface Message {
   content: string
 }
 
+function renderInlineLinks(text: string) {
+  const parts = text.split(/(\[[^\]]+\]\(https?:\/\/[^)]+\))/g)
+  return parts.map((part, i) => {
+    const match = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/)
+    if (match) {
+      return (
+        <a key={i} href={match[2]} target="_blank" rel="noopener noreferrer"
+          className="text-[#0071e3] underline underline-offset-2 hover:text-[#0077ed]">
+          {match[1]}
+        </a>
+      )
+    }
+    return part
+  })
+}
+
 function AnswerText({ text }: { text: string }) {
   const paragraphs = text.split(/\n\n+/).filter(Boolean)
   return (
     <div className="space-y-4">
       {paragraphs.map((para, i) => (
         <p key={i} className="text-[17px] text-[#1d1d1f] leading-relaxed">
-          {para.replace(/\n/g, ' ')}
+          {renderInlineLinks(para.replace(/\n/g, ' '))}
         </p>
       ))}
     </div>

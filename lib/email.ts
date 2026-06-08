@@ -50,7 +50,8 @@ export async function sendNewArticlesEmail(articles: Article[]) {
   <hr style="border:none;border-top:1px solid #d2d2d7;margin:32px 0;" />
   <p style="font-size:12px;color:#6e6e73;margin:0;">
     You're receiving this because you're signed up to Life Under CANVAS updates.<br/>
-    <a href="${process.env.NEXT_PUBLIC_BASE_URL}" style="color:#0071e3;">Visit the site</a> to ask questions about the latest research.
+    <a href="${process.env.NEXT_PUBLIC_BASE_URL}" style="color:#0071e3;">Visit the site</a> to ask questions about the latest research.<br/>
+    To stop receiving these updates, reply to this email.
   </p>
 </body>
 </html>`
