@@ -38,10 +38,12 @@ export async function GET(request: Request) {
   const allArticles = [...research, ...preprints, ...trials, ...isrctn, ...news, ...ataxiauk, ...euroataxia, ...youtube]
   const newArticles = allArticles.filter((a) => !seenSet.has(a.id))
 
+  const isUnsubscribed = await kv.get('email_unsubscribed')
+
   if (newArticles.length > 0) {
     const date = new Date().toISOString().slice(0, 10)
     await Promise.all([
-      sendNewArticlesEmail(newArticles),
+      isUnsubscribed ? Promise.resolve() : sendNewArticlesEmail(newArticles),
       put(`archive/${date}.json`, JSON.stringify(newArticles), {
         access: 'public',
         contentType: 'application/json',

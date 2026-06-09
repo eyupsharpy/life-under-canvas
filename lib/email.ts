@@ -30,6 +30,7 @@ export async function sendNewArticlesEmail(articles: Article[]) {
   const gmail = getGmailClient()
   const to = 'sharp.darlene@googlemail.com'
   const subject = `${articles.length} new CANVAS ${articles.length === 1 ? 'update' : 'updates'} found`
+  const unsubscribeUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/unsubscribe?token=${process.env.UNSUBSCRIBE_SECRET}`
 
   const research = articles.filter(a => a.source === 'PubMed' || a.source === 'Europe PMC')
   const trials = articles.filter(a => a.source === 'ClinicalTrials.gov')
@@ -51,7 +52,7 @@ export async function sendNewArticlesEmail(articles: Article[]) {
   <p style="font-size:12px;color:#6e6e73;margin:0;">
     You're receiving this because you're signed up to Life Under CANVAS updates.<br/>
     <a href="${process.env.NEXT_PUBLIC_BASE_URL}" style="color:#0071e3;">Visit the site</a> to ask questions about the latest research.<br/>
-    To stop receiving these updates, reply to this email.
+    <a href="${unsubscribeUrl}" style="color:#6e6e73;">Unsubscribe</a>
   </p>
 </body>
 </html>`
@@ -61,6 +62,8 @@ export async function sendNewArticlesEmail(articles: Article[]) {
     `Subject: ${subject}`,
     'MIME-Version: 1.0',
     'Content-Type: text/html; charset=utf-8',
+    `List-Unsubscribe: <${unsubscribeUrl}>`,
+    'List-Unsubscribe-Post: List-Unsubscribe=One-Click',
     '',
     html,
   ].join('\n')
