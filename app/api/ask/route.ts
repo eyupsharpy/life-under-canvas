@@ -4,12 +4,20 @@ import { fetchPreprints } from '@/lib/europepmc'
 
 const client = new Anthropic()
 
+const STATIC_REFERENCES = [
+  {
+    title: 'Cerebellar ataxia, neuropathy, vestibular areflexia syndrome (CANVAS) — Wikipedia',
+    url: 'https://en.wikipedia.org/wiki/Cerebellar_ataxia,_neuropathy,_vestibular_areflexia_syndrome',
+  },
+]
+
 async function getRecentArticles() {
   const [pubmed, preprints] = await Promise.allSettled([
     fetchLatestArticles(15),
     fetchPreprints(8),
   ])
   return [
+    ...STATIC_REFERENCES,
     ...(pubmed.status === 'fulfilled' ? pubmed.value : []),
     ...(preprints.status === 'fulfilled' ? preprints.value : []),
   ]
@@ -25,7 +33,7 @@ export async function POST(request: Request) {
   const articles = await getRecentArticles()
 
   const citationContext = articles.length > 0
-    ? `\n\nYou have access to the following recent CANVAS research articles from PubMed. When your answer references findings that match one of these articles, cite it inline as [Title](URL). Only cite articles from this list — do not invent citations.\n\nRecent articles:\n${articles.map((a) => `- ${a.title} | ${a.url}`).join('\n')}`
+    ? `\n\nYou have access to the following CANVAS reference sources. When your answer references findings that match one of these sources, cite it inline as [Title](URL). Only cite sources from this list — do not invent citations.\n\nSources:\n${articles.map((a) => `- ${a.title} | ${a.url}`).join('\n')}`
     : ''
 
   const message = await client.messages.create({
