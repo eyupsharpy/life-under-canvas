@@ -1,15 +1,18 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { fetchLatestArticles } from '@/lib/pubmed'
+import { fetchPreprints } from '@/lib/europepmc'
 
 const client = new Anthropic()
 
 async function getRecentArticles() {
-  try {
-    const articles = await fetchLatestArticles(15)
-    return articles
-  } catch {
-    return []
-  }
+  const [pubmed, preprints] = await Promise.allSettled([
+    fetchLatestArticles(15),
+    fetchPreprints(8),
+  ])
+  return [
+    ...(pubmed.status === 'fulfilled' ? pubmed.value : []),
+    ...(preprints.status === 'fulfilled' ? preprints.value : []),
+  ]
 }
 
 export async function POST(request: Request) {
