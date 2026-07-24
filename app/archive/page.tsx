@@ -5,7 +5,13 @@ import type { Article } from '@/lib/types'
 export const dynamic = 'force-dynamic'
 
 async function getArchive(): Promise<{ date: string; articles: Article[] }[]> {
-  const { blobs } = await list({ prefix: 'archive/' })
+  let blobs: Awaited<ReturnType<typeof list>>['blobs']
+  try {
+    ;({ blobs } = await list({ prefix: 'archive/' }))
+  } catch (err) {
+    console.error('Failed to list archive blobs:', err)
+    return []
+  }
 
   const sorted = blobs
     .filter((b) => b.pathname.endsWith('.json'))
