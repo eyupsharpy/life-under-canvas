@@ -101,7 +101,7 @@ export default async function ArchivePage() {
 
       <div className="max-w-5xl mx-auto px-6 py-16 md:py-24">
         <h1 className="text-5xl md:text-7xl font-bold text-[#1d1d1f] mb-6 leading-tight">
-          Archive.
+          Daily Digest.
         </h1>
         <p className="text-xl text-[#6e6e73] mb-16 max-w-2xl">
           Every update sent to Darlene, in one place.
