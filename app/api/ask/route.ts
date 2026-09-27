@@ -55,7 +55,7 @@ Format your responses clearly: use short paragraphs. Do not use markdown headers
     const status = err instanceof Anthropic.APIError ? err.status : undefined
     console.error('ask: Anthropic call failed', status, err)
     return Response.json(
-      { error: 'The Ask service is unavailable right now. Please try again later.', status: status ?? null, kind: err instanceof Error ? err.name : 'unknown', detail: err instanceof Anthropic.APIError ? String(err.message).slice(0, 160) : null },
+      { error: 'The Ask service is unavailable right now. Please try again later.', status: status ?? null, kind: err instanceof Error ? err.name : 'unknown' },
       { status: 502 },
     )
   }
