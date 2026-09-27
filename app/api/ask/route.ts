@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { fetchLatestArticles } from '@/lib/pubmed'
 import { fetchPreprints } from '@/lib/europepmc'
 
-const client = new Anthropic()
+
 
 const STATIC_REFERENCES = [
   {
@@ -36,7 +36,10 @@ export async function POST(request: Request) {
     ? `\n\nYou have access to the following CANVAS reference sources. When your answer references findings that match one of these sources, cite it inline as [Title](URL). Only cite sources from this list — do not invent citations.\n\nSources:\n${articles.map((a) => `- ${a.title} | ${a.url}`).join('\n')}`
     : ''
 
-  const message = await client.messages.create({
+  let message
+  try {
+    const client = new Anthropic()
+    message = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
     system: `You are a knowledgeable and compassionate assistant helping someone who lives with CANVAS syndrome (Cerebellar Ataxia with Neuropathy and Vestibular Areflexia Syndrome).
@@ -47,7 +50,15 @@ CANVAS syndrome is a rare recessive ataxia caused by biallelic RFC1 repeat expan
 
 Format your responses clearly: use short paragraphs. Do not use markdown headers or bullet points — write in flowing prose.${citationContext}`,
     messages,
-  })
+    })
+  } catch (err) {
+    const status = err instanceof Anthropic.APIError ? err.status : undefined
+    console.error('ask: Anthropic call failed', status, err)
+    return Response.json(
+      { error: 'The Ask service is unavailable right now. Please try again later.', status: status ?? null, kind: err instanceof Error ? err.name : 'unknown' },
+      { status: 502 },
+    )
+  }
 
   const text = message.content[0].type === 'text' ? message.content[0].text : ''
 
